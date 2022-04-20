@@ -1,8 +1,11 @@
 package com.example.myapplication;
 
-
+import androidx.appcompat.app.AppCompatActivity;
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.View;
@@ -10,6 +13,14 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Vibrator;
+import android.widget.Toast;
+
+import java.util.Calendar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -35,12 +46,16 @@ public class MainActivity extends AppCompatActivity {
         //  setDateAndTime();
         txtDateTime.setText(DateUtils.formatDateTime(this,dateTime.getTimeInMillis(),DateUtils.FORMAT_SHOW_DATE
                 | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME));
-        btnDate.setOnClickListener(view -> new DatePickerDialog(MainActivity.this,
-                d,
-                dateTime.get(Calendar.YEAR),
-                dateTime.get(Calendar.MONTH),
-                dateTime.get(Calendar.DAY_OF_MONTH))
-                .show());
+        btnDate.setOnClickListener(view->
+        {
+            int seconds = dateTime.get(Calendar.HOUR_OF_DAY)*60*60+dateTime.get(Calendar.MINUTE)*60+dateTime.get(Calendar.SECOND);
+            Toast toast = Toast.makeText(getApplicationContext(),
+                    "Поздравляю, будильник поставлен", Toast.LENGTH_SHORT);
+            toast.show();
+            Intent intent =new Intent(MainActivity.this,Alarm.class);
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarmManager.set(AlarmManager.RTC_WAKEUP,dateTime.getTimeInMillis(), PendingIntent.getBroadcast(getApplicationContext(),0,intent,0));
+        });
 
         btnTime.setOnClickListener(new View.OnClickListener() {
 
@@ -49,8 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 new TimePickerDialog(MainActivity.this, t,
                         dateTime.get(Calendar.HOUR_OF_DAY),
                         dateTime.get(Calendar.MINUTE),
-                        true)
-                        .show();
+                        true).show();
             }
 
 
@@ -80,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
                     DateUtils.FORMAT_SHOW_DATE
                             | DateUtils.FORMAT_SHOW_YEAR | DateUtils.FORMAT_SHOW_TIME));
         }
+
+
+
     };
 
 
